@@ -1,0 +1,389 @@
+<html>
+    <head>
+        <title>Test Web Site</title>
+        <style>
+            @import url(https://db.onlinewebfonts.com/c/0bfefb90663ca84ba4fce0568220bfe6?family=ReportSchoolHv-Regular);
+
+            body {
+                font-family: "ReportSchoolHv-Regular";
+                letter-spacing: 0em;
+            }
+
+            #title {
+                position: relative;
+                display: flex;
+            }
+
+            #titleSub {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                /* display: flex; */
+                text-align: center;
+                justify-content: center; /* 가로 가운데 정렬 */
+                align-items: center;     /* 세로 가운데 정렬 */
+                height: auto;           /* 높이 지정 필요 */
+            }
+
+            #titleSub p1{
+                font-size: 50px;
+            }
+
+            #titleSub p2{
+                font-size: 20px;
+            }
+
+            #navBox {
+                width:10vw;
+            }
+
+            #navBox p{
+                margin-left: 10px;
+                font-size: 20px;
+            }
+
+            #newArrivalNav{
+                padding-top: 0.2vw;
+                padding-bottom: 0.2vw;
+                margin-bottom: 0.2vw;
+            }
+            
+            #bestSellerNav{
+                padding-top: 0.2vw;
+                padding-bottom: 0.2vw;
+                margin-bottom: 0.2vw;
+            }
+
+            #newArrivalNav:hover, #bestSellerNav:hover{
+                background-color: #ffb5de;
+                width: 100%;
+                height: auto;
+                padding-top: 0.2vw;
+                padding-bottom: 0.2vw;
+                margin-bottom: 0.2vw;
+                box-shadow: 5px 5px 1px 1px rgb(0 0 0);
+            }
+            
+
+            .bold {
+                font-weight: bold;
+            }
+
+            /* 메인 영역 (카드 캐러셀 포함 영역) */
+            #coord {
+                position: relative; /* 내부 요소 absolute 위치 기준 */
+                width: 100%;        /* 전체 너비 */
+                /* background-color: #ccc; 배경 회색 */
+                cursor: none;       /* 마우스 커서 감춤 */
+                overflow: hidden;   /* 내부 요소 넘침 숨김 */
+            }
+
+            /* 캐러셀 영역: 슬라이드들을 가로로 나열 */
+            #carousel {
+                display: flex; /* 슬라이드 수평 정렬 */
+                transition: transform 0.5s ease-in-out; /* 부드러운 슬라이드 애니메이션 */
+                height: auto; /* 슬라이드 내용 높이에 맞게 자동 확장 */
+                width: 100%;
+                position: relative;
+                /* z-index: 2; 좌우 클릭 감지 영역(#sidesWrapper)보다 위에 위치 */
+            }
+
+            /* 각 슬라이드 */
+            .slide {
+                flex: 0 0 100%; /* 한 번에 하나의 슬라이드만 보이도록 */
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 36px;
+                color: white;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+
+            /* 슬라이드별 배경색 지정 */
+            /* .slide:nth-child(1) { background-color: crimson; }
+            .slide:nth-child(2) { background-color: teal; }
+            .slide:nth-child(3) { background-color: goldenrod; }
+            .slide:nth-child(4) { background-color: pink; } */
+
+            /* 카드들을 담는 그리드 컨테이너 */
+            .card-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr); /* 4열 */
+                grid-template-rows: repeat(2, 1fr);    /* 2행 */
+                /* gap: 1px;                             카드 간 간격 */
+                width: fit-content;                    /* 카드들의 크기에 맞게 컨테이너 너비 자동 조절 */
+                margin: auto;                          /* 수평 중앙 정렬 */
+            }
+
+            /* 개별 카드 스타일 */
+            .card {
+                /* position: relative; */
+                background-color: #f0f0f0;      /* 배경 흰색 */
+                color: black;                 /* 글자색 검정 */
+                border-radius: 8px;           /* 모서리 둥글게 */
+                box-shadow: 5px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                width: 20vw;                 /* 고정된 카드 너비 */
+                height: 30vw;                /* 고정된 카드 높이 */
+                margin: 1vw;                /* 바깥 여백 */
+                z-index: 50;
+            }
+
+            /* 마우스 클릭 감지를 위한 투명한 좌우 레이어 */
+            #sidesWrapper {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;   /* 좌우를 반반 나누기 위한 flex */
+                /* z-index: 3;      캐러셀 위로 올라와야 클릭 이벤트 감지 가능 */
+            }
+
+            /* 좌우 클릭 영역: 배경은 없음 */
+            #rightSide, #leftSide {
+                width: 50%;
+                height: 100%;
+                background-color: transparent;
+            }
+
+            /* 사용자 정의 커서 아이콘 (좌우 화살표) */
+            #customCursorRight, #customCursorLeft {
+                position: fixed;       /* 화면 기준 고정 위치 */
+                font-size: 24px;
+                height: 24px;
+                pointer-events: none;  /* 마우스 이벤트를 막지 않도록 설정 */
+                display: none;         /* 기본적으로 숨김 */
+                color: rgb(0, 0, 0);
+                z-index: 9999;         /* 가장 위에 표시 */
+            }
+
+            .bold-style {
+                /* font-weight: bold; */
+                background-color: #ffb5de;
+                width: 100%;
+                height: auto;
+                padding-top: 0.2vw;
+                padding-bottom: 0.2vw;
+                margin-bottom: 0.2vw;
+                box-shadow: 5px 5px 1px 1px rgb(0 0 0);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <h1>Mouse Pointer Coordinate Test</h1> -->
+        <!-- style="margin-top: 50px;" -->
+        <div>
+            <div id="title">
+                <div id="navBox">
+                    <div id="newArrivalNav" onclick="goToSlide(0)">
+                        <p>New Arrival</p>
+                    </div>
+                    <div id="bestSellerNav" onclick="goToSlide(2)">
+                        <p>Best Seller</p>
+                    </div>
+                </div>
+                <div id="titleSub">
+                    <p1>New Style</p1>
+                </br>
+                    <p2>this is new arrival sub test</p2>
+                </div>
+            </div>
+
+
+            <!-- 마우스 좌우 클릭 감지 및 캐러셀 포함 영역 -->
+            <div id="coord">
+
+                <!-- 캐러셀 전체 -->
+                <div id="carousel">
+
+                    <!-- 슬라이드 1 -->
+                    <div class="slide">
+                        <div class="card-container">
+                            <!-- 카드 1~8 -->
+                            <div class="card" onclick="location.href='https://www.google.com/'">Card 1</div>
+                            <div class="card">Card 2</div>
+                            <div class="card">Card 3</div>
+                            <div class="card">Card 4</div>
+                            <div class="card">Card 5</div>
+                            <div class="card">Card 6</div>
+                            <div class="card">Card 7</div>
+                            <div class="card">Card 8</div>
+                        </div>
+                    </div>
+
+                    <!-- 슬라이드 2 -->
+                    <div class="slide">
+                        <div class="card-container">
+                            <div class="card">Card 1</div>
+                            <div class="card">Card 2</div>
+                            <div class="card">Card 3</div>
+                            <div class="card">Card 4</div>
+                            <div class="card">Card 5</div>
+                            <div class="card">Card 6</div>
+                            <div class="card">Card 7</div>
+                            <div class="card">Card 8</div>
+                        </div>
+                    </div>
+
+                    <!-- 슬라이드 3 -->
+                    <div class="slide">
+                        <div class="card-container">
+                            <div class="card">Card 1</div>
+                            <div class="card">Card 2</div>
+                            <div class="card">Card 3</div>
+                            <div class="card">Card 4</div>
+                            <div class="card">Card 5</div>
+                            <div class="card">Card 6</div>
+                            <div class="card">Card 7</div>
+                            <div class="card">Card 8</div>
+                        </div>
+                    </div>
+                    <!-- 슬라이드 4 -->
+                    <div class="slide">
+                        <div class="card-container">
+                            <div class="card">Card 1</div>
+                            <div class="card">Card 2</div>
+                            <div class="card">Card 3</div>
+                            <div class="card">Card 4</div>
+                            <div class="card">Card 5</div>
+                            <div class="card">Card 6</div>
+                            <div class="card">Card 7</div>
+                            <div class="card">Card 8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 좌우 클릭 감지용 투명한 레이어 -->
+                <div id="sidesWrapper">
+                    <div id="leftSide" onclick="left();"></div>
+                    <div id="rightSide" onclick="right();"></div>
+                </div>
+            </div>
+
+            <!-- 결과 텍스트 출력 영역 -->
+            <div id="result"></div>
+
+            <!-- 사용자 커서 화살표 (좌우) -->
+            <div id="customCursorRight">⮞</div>
+            <div id="customCursorLeft">⮜</div>
+        </div>
+
+        <script>
+            // 요소 참조
+            var div = document.getElementById('coord');
+            var titleSub = document.getElementById('titleSub')
+            var width = div.offsetWidth;
+            var height = div.offsetHeight;
+            var result = document.getElementById('result');
+            var carousel = document.getElementById('carousel');
+            var currentIndex = 0;
+            var totalSlides = 4;
+
+            // 마우스 움직임 감지 (좌/우 판별 및 커서 표시)
+            div.addEventListener('mousemove', function(e) {
+
+                // result.innerHTML = `<p><strong>screenX, Y:</strong> (${e.screenX}, ${e.screenY}) <strong>모니터(스크린)</strong> 기준</p>`;
+                // result.innerHTML += `<p><strong>clientX, Y:</strong> (${e.clientX}, ${e.clientY}) <strong>브라우저</strong> 기준</p>`;
+                // result.innerHTML += `<p><strong>pageX, Y:</strong> (${e.pageX}, ${e.pageY}) <strong>페이지(스크롤 포함)</strong> 기준</p>`;
+                // result.innerHTML += `<p><strong>offsetX, Y:</strong> (${e.offsetX}, ${e.offsetY}) <strong>특정 요소 기준</strong> 기준</p>`;
+                
+                if (e.clientX > div.offsetWidth / 2 && e.clientX < div.offsetWidth) {
+                    // 오른쪽 반면
+                    div.style.cursor = "none";
+                    customCursorRight.style.display = "block";
+                    customCursorRight.style.left = (e.clientX + 5) + "px";
+                    customCursorRight.style.top = (e.clientY + 5) + "px";
+                    customCursorLeft.style.display = "none";
+                } else {
+                    // 왼쪽 반면
+                    div.style.cursor = "none";
+                    customCursorLeft.style.display = "block";
+                    customCursorLeft.style.left = (e.clientX + 5) + "px";
+                    customCursorLeft.style.top = (e.clientY + 5) + "px";
+                    customCursorRight.style.display = "none";
+                }
+            });
+
+            // 마우스가 영역 밖으로 나갔을 때 초기화
+            div.addEventListener('mouseleave', function() {
+                div.style.cursor = "default"; // 커서 복원
+                customCursorRight.style.display = "none";
+                customCursorLeft.style.display = "none";
+            });
+
+            // 캐러셀 이동 업데이트 함수
+            function updateCarousel() {
+                const offset = -currentIndex * 100; // 슬라이드 크기만큼 이동
+                carousel.style.transform = `translateX(${offset}%)`; // 슬라이드 이동
+            }
+
+            // 왼쪽 클릭 (이전 슬라이드)
+            function left() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                } else {
+                    currentIndex = totalSlides-1
+                }
+                updateCarousel();
+            }
+
+            // 오른쪽 클릭 (다음 슬라이드)
+            function right() {
+                if (currentIndex < totalSlides - 1) {
+                    currentIndex++;
+                } else {
+                    currentIndex = 0
+                }
+                updateCarousel();
+            }
+            document.querySelectorAll('.card').forEach(function(card) {
+                card.addEventListener('click', function(event) {
+                    event.stopPropagation(); // 캐러셀 클릭과 겹치지 않게 처리
+                });
+            });
+
+            function goToSlide(index) {
+                if (index >= 0 && index < totalSlides) {
+                    currentIndex = index;
+                    updateCarousel();
+                }
+            }
+
+            if (currentIndex === 0){
+                newArrivalNav.classList.add('bold-style');
+            }
+
+            function updateNavBold() {
+                const newArrivalNav = document.getElementById('newArrivalNav');
+                const bestSellerNav = document.getElementById('bestSellerNav');
+
+                // 일단 모두 클래스를 제거
+                newArrivalNav.classList.remove('bold-style');
+                bestSellerNav.classList.remove('bold-style');
+
+                // 현재 슬라이드 인덱스에 따라 bold 클래스 추가
+                if (currentIndex <= 1) {
+                    newArrivalNav.classList.add('bold-style');
+                    titleSub.innerHTML = `<p1>New Style</p1></br><p2>this is new arrival sub test</p2>`
+                } else if (currentIndex >= 2) {
+                    bestSellerNav.classList.add('bold-style');
+                    titleSub.innerHTML = `<p1>Best Seller</p1></br><p2>this is best seller sub test</p2>`
+                }
+            }
+
+            function updateCarousel() {
+                const offset = -currentIndex * 100; // 슬라이드 이동 거리
+                carousel.style.transform = `translateX(${offset}%)`;
+                
+                updateNavBold();  // 네비게이션 스타일 업데이트
+            }
+        </script>
+    </body>
+</html>

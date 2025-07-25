@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang = 'kor'>
+    <head>
+        <meta charset="UTF-8">
+        <title> Cursur Action </title>
+
+        <style>
+            body {
+                cursor: default;
+            }
+
+            /*.custom-cursor {
+                position: absolute;
+            }
+            */
+
+            .char {
+                position: fixed;
+                font-size: 13px;
+                font-weight: bold;
+                color: purple;
+                pointer-events: none;
+                z-index: 9999;
+                transition: transform 0.1s linear;
+                margin-right: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <span class="char">PROMOTION</span>
+        
+        <!-- <span class="char">R</span>
+        <span class="char">O</span>
+        <span class="char">M</span>
+        <span class="char">O</span>
+        <span class="char">T</span>
+        <span class="char">I</span>
+        <span class="char">O</span>
+        <span class="char">N</span> -->
+        
+
+        <script>
+            const chars = document.querySelectorAll('.char');
+            let mouse = { x: 0, y: 0 };
+            let positions = [];
+
+            // 초기 문자 위치
+            for (let i = 0; i < chars.length; i++) {
+                positions.push({ x: 0, y: 0 });
+            }
+
+            document.addEventListener('mousemove', e => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+             });
+
+            function animate() {
+                // 각 문자 위치 계산
+                positions[0].x += (mouse.x - positions[0].x) * 0.2;
+                positions[0].y += (mouse.y - positions[0].y) * 0.2;
+
+                for (let i = 1; i < chars.length; i++) {
+                    positions[i].x += (positions[i - 1].x - positions[i].x) * 0.2;
+                    positions[i].y += (positions[i - 1].y - positions[i].y) * 0.2;
+                }
+
+                // 화면에 적용
+                for (let i = 0; i < chars.length; i++) {
+                    chars[i].style.transform = `translate(${positions[i].x}px, ${positions[i].y}px)`;
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        </script>
+    </body>
+</html>
